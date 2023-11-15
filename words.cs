@@ -1,5 +1,4 @@
  namespace WordlessAPI
-
  {
      public static class Words
      {

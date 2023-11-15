@@ -1,14 +1,12 @@
 using System.Diagnostics;
 using WordlessAPI;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
-
 
 if (app.Environment.IsDevelopment())
 {
@@ -64,6 +62,7 @@ public class QueryMatchCountRequest
           this.guesses = new string[] {};
      }
 }
+
  public class QueryMatchCountResponse
 {
      public int count { get; set; }
