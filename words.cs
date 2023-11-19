@@ -4,18 +4,18 @@
      {
           private static Random rand = new Random();
 
-          public static bool wordExists( string word )
+          public static bool WordExists( string word )
           {
                return ( 0 <= Array.BinarySearch<string>( wordList, 0, wordList.Length, word.ToLower() ) );
           }
 
-          public static Tuple<Int32, string> randomWord ()
+          public static Tuple<Int32, string> RandomWord ()
           {
                float r = rand.NextSingle();
-               return new Tuple<Int32, string>( 0, getWordByIndex( r ) );
+               return new Tuple<Int32, string>( 0, GetWordByIndex( r ) );
           }
 
-          public static Tuple<Int32, string> todaysWord ( int dayIndex )
+          public static Tuple<Int32, string> TodaysWord ( int dayIndex )
           {      
                     // for parameter >=0, return word from N days ago (0 = today)    
                if( dayIndex >= 0 )
@@ -28,19 +28,84 @@
 
                     float r = new Random( todayEpoch - dayIndex ).NextSingle();
 
-                    return new Tuple<Int32, string>( todayEpoch - dayIndex, getWordByIndex( r ) );
+                    return new Tuple<Int32, string>( todayEpoch - dayIndex, GetWordByIndex( r ) );
                }
 
-               return randomWord ();
+               return RandomWord ();
           }
 
-          private static string getWordByIndex( float randomNumber )
+          private static string GetWordByIndex( float randomNumber )
           {
                int index = (int) ( randomNumber * wordList.Length );
                return wordList[ index ];
           }
 
-          
+                    static bool MatchesYellow( string testWord, string guessChar, int charIndex )
+          {
+               return !MatchesGreen( testWord, guessChar, charIndex) && testWord.Contains(guessChar);
+          }
+
+          static bool MatchesGreen( string testWord, string guessChar, int charIndex )
+          {
+               return guessChar == testWord.Substring( charIndex, 1 );
+          }
+
+          static bool IsCompatibleWithClues( string testWord, string answer, string guess )
+          {
+
+               for( int i = 0; i < testWord.Length; i++ )
+               {
+                    string c = guess.Substring( i, 1 );
+                    if( MatchesGreen( answer, c, i ) )
+                    {
+                         // guess character matched green against answer, 
+                         // but doesnt match green for testWord letter: eliminate
+                         if( !MatchesGreen( testWord, c, i ) )
+                              return false;
+                    }
+                    else if( MatchesYellow ( answer, c, i ) )
+                    {
+                         // guess matches a letter elsewhere in answer, 
+                         // does it do so in testWord?
+                         if( !MatchesYellow( testWord, c, i ) )
+                              return false;
+                    }
+                    else
+                    {
+                         // letter c is not in answer. Is it in the Candidate? 
+                         // Reject if it is.
+                         if( testWord.Contains( c ) )
+                              return false;
+                    }
+               }
+               return true;
+          }
+
+          public static int FindMatches( string[] candidates, string answer, List<string> guesses )
+          {
+               int matchCount = 0;
+
+               foreach( var candidate in candidates )
+               {
+                    bool finalIsMatch = true;
+                    foreach( var guess in guesses )
+                    {
+                         if( !IsCompatibleWithClues( candidate, answer, guess ) )
+                         {
+                              finalIsMatch = false;
+                              break;
+                         }
+                    }
+
+                    if( finalIsMatch )
+                    {
+                         matchCount ++;
+                    }
+               }
+
+               return matchCount;
+          }
+
           public static string [] wordList = {
                "abaci",
                "aback",
