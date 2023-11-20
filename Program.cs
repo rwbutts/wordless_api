@@ -1,5 +1,6 @@
 using WordlessAPI;
 using System.Reflection;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 
 Assembly assembly = Assembly.GetExecutingAssembly();
 Version? apiVersion = assembly.GetName().Version;
@@ -8,14 +9,17 @@ const string headerName = "X-wordless-api-version";
 string headerValue = apiVersion?.ToString() ?? "unknown";
 
 var builder = WebApplication.CreateBuilder(args);
+var services = builder.Services;
 
 // Access CORS settings from configuration
 var configuration = builder.Configuration;
-var corsPolicyName = configuration["Kestrel:Cors:PolicyName"];
-var allowedOrigins = configuration.GetSection("Kestrel:Cors:AllowedOrigins").Get<string[]>();
-var allowedMethods = configuration.GetSection("Kestrel:Cors:AllowedMethods").Get<string[]>();
-var allowedHeaders = configuration.GetSection("Kestrel:Cors:AllowedHeaders").Get<string[]>();
-var allowCredentials = configuration.GetValue<bool>("Kestrel:Cors:AllowCredentials");
+var corsSection = configuration.GetSection("Kestrel:Cors");
+
+var corsPolicyName = corsSection["PolicyName"];
+var allowedOrigins = corsSection.GetSection("AllowedOrigins").Get<string[]>() ?? new string[]{"*"};
+var allowedMethods = corsSection.GetSection("AllowedMethods").Get<string[]>() ?? new string[]{"*"};
+var allowedHeaders = corsSection.GetSection("AllowedHeaders").Get<string[]>() ?? new string[]{"*"};
+var allowCredentials = corsSection.GetValue<bool>("AllowCredentials");
 
 builder.Services.AddCors(options =>
 {
@@ -24,8 +28,11 @@ builder.Services.AddCors(options =>
           {
                builder.WithOrigins(allowedOrigins)
                     .WithMethods(allowedMethods)
-                    .WithHeaders(allowedHeaders)
-                    .DisallowCredentials();
+                    .WithHeaders(allowedHeaders);
+                    if( allowCredentials )
+                         builder.AllowCredentials();
+                    else
+                         builder.DisallowCredentials();
           });
 });
 
