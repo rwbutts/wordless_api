@@ -15,7 +15,7 @@ var services = builder.Services;
 var configuration = builder.Configuration;
 var corsSection = configuration.GetSection("Kestrel:Cors");
 
-var corsPolicyName = corsSection["PolicyName"];
+var corsPolicyName = corsSection["PolicyName"]?? "DefaultPolicy";
 var allowedOrigins = corsSection.GetSection("AllowedOrigins").Get<string[]>() ?? new string[]{"*"};
 var allowedMethods = corsSection.GetSection("AllowedMethods").Get<string[]>() ?? new string[]{"*"};
 var allowedHeaders = corsSection.GetSection("AllowedHeaders").Get<string[]>() ?? new string[]{"*"};
