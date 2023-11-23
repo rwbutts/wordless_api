@@ -1,56 +1,64 @@
  namespace WordlessAPI
  {
+     public record GetWordResponse( string word );
+     public record WordExistsResponse( bool exists );
+     public record QueryMatchCountResponse( int count );
+
      public static class Words
      {
-          private static Random rand = new Random();
-
-          public static bool WordExists( string word )
+          public static WordExistsResponse WordExists( string word )
           {
-               return ( 0 <= Array.BinarySearch<string>( wordList, 0, wordList.Length, word.ToLower() ) );
+               return new WordExistsResponse( 0 <= Array.BinarySearch<string>( wordList, 0, wordList.Length, word.ToLower() ) );
           }
 
-          public static Tuple<Int32, string> RandomWord ()
+          public static GetWordResponse RandomWord()
           {
-               float r = rand.NextSingle();
-               return new Tuple<Int32, string>( 0, GetWordByIndex( r ) );
+               return TodaysWord( -1 );
           }
 
-          public static Tuple<Int32, string> TodaysWord ( int dayIndex )
+          public static GetWordResponse TodaysWord( int dayIndex )
           {      
-                    // for parameter >=0, return word from N days ago (0 = today)    
+               float r;
+               
+               // for parameter >=0, return word from N days ago (0 = today)    
                if( dayIndex >= 0 )
                {  
-                         // epoch of 1/1/2022
-                    DateTime epoch = new DateTime( 2022, 1, 1, 0, 0, 0 );
+                    // epoch of 1/1/2023
+                    DateTime epoch = new DateTime( 2023, 1, 1, 0, 0, 0 );
 
-                         // number of days since 1/1/2022 minus the DayIndex
-                    int todayEpoch = ( int ) ( ( DateTime.Now.Ticks - epoch.Ticks ) / (10000000L * 3600L * 24 ) );
+                    /**
+                    * number of days since 1/1/2022 minus the DayIndex
+                    * F(0) = today's word. -1 = yewsterday's word, ...
+                    */
+                    int nowDaysEpoch = ( int ) ( ( DateTime.Now.Ticks - epoch.Ticks ) / (10000000L * 3600L * 24 ) );
 
-                    float r = new Random( todayEpoch - dayIndex ).NextSingle();
-
-                    return new Tuple<Int32, string>( todayEpoch - dayIndex, GetWordByIndex( r ) );
+                    r = new Random( nowDaysEpoch - dayIndex ).NextSingle();
                }
-
-               return RandomWord ();
+               else
+               {
+                    r = (new Random()).NextSingle();
+               }
+               
+               return GetWordByIndex( r );
           }
 
-          private static string GetWordByIndex( float randomNumber )
+          private static GetWordResponse GetWordByIndex( float randomNumber )
           {
                int index = (int) ( randomNumber * wordList.Length );
-               return wordList[ index ];
+               return new GetWordResponse( wordList[ index ] );
           }
 
-                    static bool MatchesYellow( string testWord, string guessChar, int charIndex )
+          private static bool MatchesYellow( string testWord, string guessChar, int charIndex )
           {
                return !MatchesGreen( testWord, guessChar, charIndex) && testWord.Contains(guessChar);
           }
 
-          static bool MatchesGreen( string testWord, string guessChar, int charIndex )
+          private static bool MatchesGreen( string testWord, string guessChar, int charIndex )
           {
                return guessChar == testWord.Substring( charIndex, 1 );
           }
 
-          static bool IsCompatibleWithClues( string testWord, string answer, string guess )
+          private static bool IsCompatibleWithClues( string testWord, string answer, string guess )
           {
 
                for( int i = 0; i < testWord.Length; i++ )
@@ -81,7 +89,7 @@
                return true;
           }
 
-          public static int FindMatches( string[] candidates, string answer, List<string> guesses )
+          public static QueryMatchCountResponse CountMatches( string[] candidates, string answer, List<string> guesses )
           {
                int matchCount = 0;
 
@@ -103,7 +111,7 @@
                     }
                }
 
-               return matchCount;
+               return new QueryMatchCountResponse( matchCount );
           }
 
           public static string [] wordList = {

@@ -59,30 +59,28 @@ app.MapGet("/healthcheck", (HttpContext context) => {
 app.MapGet("/randomword",  ( HttpContext context ) => { 
 
           context.Response.Headers.Add( headerName, headerValue );
-          var R = Words.RandomWord( );
-          return new RandomWordResponse( R.Item1, R.Item2 );
+          return Words.RandomWord();
      }
 );
 
 app.MapGet("/checkword/{word}",  ( HttpContext context, string word ) => {
  
           context.Response.Headers.Add( headerName, headerValue );
-          return new WordExistsResponse( Words.WordExists( word ) );
+          return Words.WordExists( word );
      }
 );
 
 app.MapGet("/getword/{daysago}",  ( HttpContext context, int daysago ) => { 
 
           context.Response.Headers.Add( headerName, headerValue );
-          var R = Words.TodaysWord( daysago );
-          return new RandomWordResponse( R.Item1, R.Item2 );
+          return Words.TodaysWord( daysago );
      }
 );
 
 app.MapPost("/querymatchcount",  ( HttpContext context, QueryMatchCountRequest request) => {
      
           context.Response.Headers.Add( headerName, headerValue );
-          return new QueryMatchCountResponse( Words.FindMatches( Words.wordList, request.answer, new List<String>(request.guesses ) ) );
+          return Words.CountMatches( Words.wordList, request.answer, new List<String>(request.guesses ) );
      }
 );
 
@@ -93,22 +91,5 @@ app.Run();
 
 public record HealthCheckResponse( bool alive );
 
-public record RandomWordResponse( int index, string word );
-
-public record WordExistsResponse( bool exists );
-
-public record QueryMatchCountResponse( int count );
 
 public record QueryMatchCountRequest( string answer, string[] guesses );
-
-public class QueryMatchCountRequest1
-{
-     public string answer { get; set; } 
-     public string [] guesses { get; set; } 
-
-     public QueryMatchCountRequest1()
-     {
-          this.answer = "";
-          this.guesses = new string[] {};
-     }
-}
