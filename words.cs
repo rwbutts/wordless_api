@@ -30,13 +30,13 @@
                     * number of days since 1/1/2022 minus the DayIndex
                     * F(0) = today's word. -1 = yewsterday's word, ...
                     */
-                    int nowDaysEpoch = ( int ) ( ( DateTime.Now.Ticks - epoch.Ticks ) / (10000000L * 3600L * 24 ) );
+                    int nowDaysEpoch = ( int ) ( ( DateTime.Now.Ticks - epoch.Ticks ) / ( 10000000L * 3600L * 24 ) );
 
                     r = new Random( nowDaysEpoch - dayIndex ).NextSingle();
                }
                else
                {
-                    r = (new Random()).NextSingle();
+                    r = ( new Random() ).NextSingle();
                }
                
                return GetWordByIndex( r );
@@ -50,7 +50,7 @@
 
           private static bool MatchesYellow( string testWord, string guessChar, int charIndex )
           {
-               return !MatchesGreen( testWord, guessChar, charIndex) && testWord.Contains(guessChar);
+               return !MatchesGreen( testWord, guessChar, charIndex ) && testWord.Contains( guessChar );
           }
 
           private static bool MatchesGreen( string testWord, string guessChar, int charIndex )
@@ -69,27 +69,34 @@
                          // guess character matched green against answer, 
                          // but doesnt match green for testWord letter: eliminate
                          if( !MatchesGreen( testWord, c, i ) )
+                         {
                               return false;
+                         }
                     }
                     else if( MatchesYellow ( answer, c, i ) )
                     {
                          // guess matches a letter elsewhere in answer, 
                          // does it do so in testWord?
                          if( !MatchesYellow( testWord, c, i ) )
+                         {
                               return false;
+                         }
                     }
                     else
                     {
                          // letter c is not in answer. Is it in the Candidate? 
                          // Reject if it is.
                          if( testWord.Contains( c ) )
+                         {
                               return false;
+                         }
                     }
                }
+
                return true;
           }
 
-          public static QueryMatchCountResponse CountMatches( string[] candidates, string answer, List<string> guesses )
+          public static QueryMatchCountResponse CountMatches( IEnumerable<string> candidates, string answer, IEnumerable<string> guesses )
           {
                int matchCount = 0;
 
@@ -114,7 +121,7 @@
                return new QueryMatchCountResponse( matchCount );
           }
 
-          public static string [] wordList = {
+          public static string[] wordList = {
                "abaci",
                "aback",
                "abaft",
