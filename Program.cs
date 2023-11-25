@@ -14,11 +14,11 @@ var services = builder.Services;
 var configuration = builder.Configuration;
 var corsSection = configuration.GetSection( "Kestrel:Cors" );
 
-var corsPolicyName = corsSection[ "PolicyName" ] ?? "DefaultPolicy";
-var allowedOrigins = corsSection.GetSection( "AllowedOrigins" ).Get<string[]>() ?? new string[]{"*"};
-var allowedMethods = corsSection.GetSection( "AllowedMethods" ).Get<string[]>() ?? new string[]{"*"};
-var allowedHeaders = corsSection.GetSection( "AllowedHeaders" ).Get<string[]>() ?? new string[]{"*"};
-var allowCredentials = corsSection.GetValue<bool>( "AllowCredentials" );
+string corsPolicyName = corsSection[ "PolicyName" ] ?? "DefaultPolicy";
+string allowedOrigins = corsSection.GetValue( "AllowedOrigins", "*" );
+string allowedMethods = corsSection.GetValue( "AllowedMethods", "*" );
+string allowedHeaders = corsSection.GetValue( "AllowedHeaders", "*" );
+bool allowCredentials = corsSection.GetValue( "AllowCredentials", false );
 
 builder.Services.AddCors( options =>
 {
