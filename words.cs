@@ -8,7 +8,7 @@
      {
           public static WordExistsResponse WordExists( string word )
           {
-               return new WordExistsResponse( 0 <= Array.BinarySearch<string>( wordList, 0, wordList.Length, word.ToLower() ) );
+               return new WordExistsResponse( 0 <= Array.BinarySearch( wordList, 0, wordList.Length, word.ToLower() ) );
           }
 
           public static GetWordResponse RandomWord()
@@ -36,7 +36,7 @@
                }
                else
                {
-                    r = ( new Random() ).NextSingle();
+                    r = new Random().NextSingle();
                }
                
                return GetWordByIndex( r );
@@ -58,7 +58,7 @@
                return guessChar == testWord.Substring( charIndex, 1 );
           }
 
-          private static bool IsCompatibleWithClues( string testWord, string answer, string guess )
+          private static bool IsWordCompatibleWithClues( string testWord, string answer, string guess )
           {
 
                for( int i = 0; i < testWord.Length; i++ )
@@ -105,7 +105,7 @@
                     bool finalIsMatch = true;
                     foreach( var guess in guesses )
                     {
-                         if( !IsCompatibleWithClues( candidate, answer, guess ) )
+                         if( !IsWordCompatibleWithClues( candidate, answer, guess ) )
                          {
                               finalIsMatch = false;
                               break;
