@@ -27,35 +27,35 @@ app.UseSwagger();
 
 app.MapGet( "/healthcheck", (HttpContext context) => {
 
-          context.Response.Headers.Add( HTTP_VER_HEADER, verHeaderValue );
+          context.Response.Headers[HTTP_VER_HEADER] = verHeaderValue;
           return new HealthCheckResponse( true );
      }
 );
 
 app.MapGet( "/randomword",  ( HttpContext context ) => { 
 
-          context.Response.Headers.Add( HTTP_VER_HEADER, verHeaderValue );
+          context.Response.Headers[HTTP_VER_HEADER] = verHeaderValue;
           return Words.RandomWord();
      }
 );
 
 app.MapGet( "/checkword/{word}",  ( HttpContext context, string word ) => {
  
-          context.Response.Headers.Add( HTTP_VER_HEADER, verHeaderValue );
+          context.Response.Headers[HTTP_VER_HEADER] = verHeaderValue;
           return Words.WordExists( word );
      }
 );
 
 app.MapGet( "/getword/{daysago}",  ( HttpContext context, int daysago ) => { 
 
-          context.Response.Headers.Add( HTTP_VER_HEADER, verHeaderValue );
+          context.Response.Headers[HTTP_VER_HEADER] = verHeaderValue;
           return Words.TodaysWord( daysago );
      }
 );
 
 app.MapPost( "/querymatchcount",  ( HttpContext context, QueryMatchCountRequest request) => {
      
-          context.Response.Headers.Add( HTTP_VER_HEADER, verHeaderValue );
+          context.Response.Headers[HTTP_VER_HEADER] = verHeaderValue;
           return Words.CountMatches( Words.wordList, request.answer, request.guesses );
      }
 );
